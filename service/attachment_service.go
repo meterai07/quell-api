@@ -9,7 +9,6 @@ import (
 type AttachmentService interface {
 	FindAll() ([]entity.Attachment, error)
 	FindById(id uint) (entity.Attachment, error)
-	FindAttachmentById(id uint) (entity.Attachment, error)
 	CreateAttachment(attachment entity.Attachment) error
 	UpdateAttachment(attachment entity.Attachment, id uint) error
 	DeleteAttachment(id uint) error
@@ -32,10 +31,6 @@ func (s *attachmentService) FindAll() ([]entity.Attachment, error) {
 
 func (s *attachmentService) FindById(id uint) (entity.Attachment, error) {
 	return s.attachmentRepository.FindById(id)
-}
-
-func (s *attachmentService) FindAttachmentById(id uint) (entity.Attachment, error) {
-	return s.attachmentRepository.FindAttachmentById(id)
 }
 
 func (s *attachmentService) CreateAttachment(attachment entity.Attachment) error {
