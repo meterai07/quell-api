@@ -11,7 +11,6 @@ import (
 type AttachmentRepository interface {
 	FindAll() ([]entity.Attachment, error)
 	FindById(id uint) (entity.Attachment, error)
-	FindAttachmentById(id uint) (entity.Attachment, error)
 	CreateAttachment(attachment entity.Attachment) error
 	UpdateAttachment(attachment entity.Attachment, id uint) error
 	DeleteAttachment(id uint) error
@@ -38,15 +37,6 @@ func (r *attachmentRepository) FindAll() ([]entity.Attachment, error) {
 }
 
 func (r *attachmentRepository) FindById(id uint) (entity.Attachment, error) {
-	var attachment entity.Attachment
-	err := initializers.DB.Where("id = ?", id).First(&attachment).Error
-	if err != nil {
-		return attachment, err
-	}
-	return attachment, nil
-}
-
-func (r *attachmentRepository) FindAttachmentById(id uint) (entity.Attachment, error) {
 	var attachment entity.Attachment
 	err := initializers.DB.Where("id = ?", id).First(&attachment).Error
 	if err != nil {
