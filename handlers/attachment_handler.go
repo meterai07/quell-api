@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"path/filepath"
 	"quell-api/entity"
 	"quell-api/sdk/response"
 	"quell-api/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type attachmentHandler struct {
@@ -36,6 +38,8 @@ func (h *attachmentHandler) UploadFile(c *gin.Context) {
 		return
 	}
 
+	// newName := generateNewName(file.Filename)
+
 	link, err := h.service.UploadFile(file)
 	if err != nil {
 		response.Response(c, 500, "Internal Server Error", err.Error())
@@ -56,6 +60,12 @@ func (h *attachmentHandler) UploadFile(c *gin.Context) {
 		response.Response(c, 500, "Internal Server Error", err.Error())
 		return
 	}
+}
+
+func generateNewName(filename string) string {
+	uuid := uuid.New()
+	ext := filepath.Ext(filename)
+	return uuid.String() + ext
 }
 
 func (h *attachmentHandler) DeleteFile(c *gin.Context) {
