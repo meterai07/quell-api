@@ -56,10 +56,6 @@ func (r *postRepository) UpdatePost(post models.Post_Upload, id uint) error {
 		return result
 	}
 
-	// if (post.Title == "" || post.Content == "" || post.CategoryID == 0){
-
-	// }
-
 	if post.Title != "" {
 		postUpdate.Title = post.Title
 	}
