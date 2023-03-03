@@ -124,9 +124,9 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 }
 
 func (h *user_Handler) RegisterHandler(c *gin.Context) {
-	var body models.User_Register // membuat variabel body dengan tipe data models.User_Register
+	var body models.User_Register
 
-	if err := c.ShouldBindJSON(&body); err != nil { // binding data json ke variabel body
+	if err := c.ShouldBindJSON(&body); err != nil {
 		response.Response(c, http.StatusBadRequest, "Invalid Body Email", nil)
 		c.Abort()
 		return
@@ -138,28 +138,28 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	if result := h.userService.FindUserByEmail(body.Email); result { // cek apakah email sudah terdaftar
-		user, err := h.userService.GetUserByEmail(body.Email) // ambil data user berdasarkan email
+	if result := h.userService.FindUserByEmail(body.Email); result {
+		user, err := h.userService.GetUserByEmail(body.Email)
 		if err != nil {
 			response.Response(c, http.StatusInternalServerError, "Internal Server Error When Getting User", nil)
 			c.Abort()
 			return
 		}
 
-		if user.IsActive { // cek apakah user sudah aktif
+		if user.IsActive {
 			response.Response(c, http.StatusConflict, "Email Already Registered", nil)
 			c.Abort()
 			return
 		}
 
-		signedToken, err := sdk_jwt.GenerateToken(user) // generate token baru
+		signedToken, err := sdk_jwt.GenerateToken(user)
 		if err != nil {
 			response.Response(c, http.StatusInternalServerError, "Internal Server Error When Generating Token", nil)
 			c.Abort()
 			return
 		}
 
-		user.Token = signedToken // update token user
+		user.Token = signedToken
 
 		if err := h.userService.UpdateUser(user); err != nil {
 			response.Response(c, http.StatusInternalServerError, "Internal Server Error When Updating User", nil)
@@ -167,7 +167,7 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 			return
 		}
 
-		if err := SendValidationEmail(body.Email, signedToken); err != nil { // kirim email validasi
+		if err := SendValidationEmail(body.Email, signedToken); err != nil {
 			response.Response(c, http.StatusInternalServerError, "Internal Server Error When Sending Email", nil)
 			c.Abort()
 			return
@@ -176,14 +176,14 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	hashedPassword, err := crypto.HashValue(body.Password) // hash password
+	hashedPassword, err := crypto.HashValue(body.Password)
 	if err != nil {
 		response.Response(c, http.StatusInternalServerError, "Internal Server Error When Hashing Password", nil)
 		c.Abort()
 		return
 	}
 
-	signedToken, err := sdk_jwt.GenerateToken(entity.User{Email: body.Email}) // generate token
+	signedToken, err := sdk_jwt.GenerateToken(entity.User{Email: body.Email})
 	if err != nil {
 		response.Response(c, http.StatusInternalServerError, "Internal Server Error When Generating Token", nil)
 		c.Abort()
@@ -198,7 +198,7 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 		Token:    signedToken,
 	}
 
-	if err := h.userService.CreateUser(user); err != nil { // simpan data user ke database
+	if err := h.userService.CreateUser(user); err != nil {
 		if strings.Contains(err.Error(), "Error 1062") {
 			response.Response(c, http.StatusConflict, "Email Already Registered", nil)
 			return
@@ -208,7 +208,7 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 	}
 
 	if err := SendValidationEmail(body.Email, signedToken); err != nil { // kirim email verifikasi
-		response.Response(c, http.StatusInternalServerError, "Internal Server Error When Sending Email", nil)
+		response.Response(c, http.StatusInternalServerError, "Internal Server Error When Sending Email First Create Email", nil)
 		c.Abort()
 		return
 	}

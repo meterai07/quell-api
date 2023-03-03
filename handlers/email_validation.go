@@ -26,21 +26,6 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 		return
 	}
 
-	// var body models.Email_Register
-
-	// err := c.ShouldBindJSON(&body)
-	// if err != nil {
-	// 	response.Response(c, 400, "Invalid Body", nil)
-	// 	c.Abort()
-	// 	return
-	// }
-
-	// if err := validator.New().Struct(&body); err != nil {
-	// 	validationError := err.(validator.ValidationErrors)
-	// 	response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
-	// 	return
-	// }
-
 	token, err := jwt.ParseWithClaims(userToken, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
