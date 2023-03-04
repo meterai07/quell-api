@@ -28,13 +28,13 @@ func NewUserHandler(userService service.Service) *user_Handler {
 func (h *user_Handler) DiscordLoginHandler(c *gin.Context) {
 	email := c.Query("email")
 	if email == "" {
-		response.Response(c, 400, "Invalid Email", nil)
+		response.Response(c, http.StatusBadRequest, "Invalid Email", nil)
 		c.Abort()
 		return
 	}
 	password := c.Query("password")
 	if password == "" {
-		response.Response(c, 400, "Invalid Token", nil)
+		response.Response(c, http.StatusBadRequest, "Invalid Token", nil)
 		c.Abort()
 		return
 	}
