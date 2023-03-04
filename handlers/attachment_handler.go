@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"path/filepath"
+	"net/http"
 	"quell-api/entity"
 	"quell-api/sdk/response"
 	"quell-api/service"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type attachmentHandler struct {
@@ -22,19 +21,19 @@ func NewAttachmentHandler(service service.AttachmentService) *attachmentHandler 
 func (h *attachmentHandler) UploadFile(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Response(c, 400, "failed when parsing id", nil)
+		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
 		return
 	}
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		response.Response(c, 400, "Invalid File", err.Error())
+		response.Response(c, http.StatusBadRequest, "Invalid File", err.Error())
 		return
 	}
 
 	result := c.PostForm("name")
 	if result == "" {
-		response.Response(c, 400, "Invalid File", err.Error())
+		response.Response(c, http.StatusBadRequest, "Invalid File", err.Error())
 		return
 	}
 
@@ -42,11 +41,11 @@ func (h *attachmentHandler) UploadFile(c *gin.Context) {
 
 	link, err := h.service.UploadFile(file)
 	if err != nil {
-		response.Response(c, 500, "Internal Server Error", err.Error())
+		response.Response(c, http.StatusInternalServerError, "Internal Server Error", err.Error())
 		return
 	}
 
-	response.Response(c, 200, "Success", link)
+	response.Response(c, http.StatusOK, "Success", link)
 
 	newBody := entity.Attachment{
 		Name:   result,
@@ -57,52 +56,46 @@ func (h *attachmentHandler) UploadFile(c *gin.Context) {
 
 	err = h.service.CreateAttachment(newBody)
 	if err != nil {
-		response.Response(c, 500, "Internal Server Error", err.Error())
+		response.Response(c, http.StatusInternalServerError, "Internal Server Error", err.Error())
 		return
 	}
-}
-
-func generateNewName(filename string) string {
-	uuid := uuid.New()
-	ext := filepath.Ext(filename)
-	return uuid.String() + ext
 }
 
 func (h *attachmentHandler) DeleteFile(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Response(c, 400, "failed when parsing id", nil)
+		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
 		return
 	}
 
 	attid, err := strconv.ParseUint(c.Param("attid"), 10, 64)
 	if err != nil {
-		response.Response(c, 400, "failed when parsing id", nil)
+		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
 		return
 	}
 
 	result, err := h.service.FindById(uint(attid))
 	if err != nil {
-		response.Response(c, 500, "Internal Server Error", err.Error())
+		response.Response(c, http.StatusInternalServerError, "Internal Server Error", err.Error())
 		return
 	}
 
 	if result.PostID != uint(id) {
-		response.Response(c, 400, "Invalid File", err.Error())
+		response.Response(c, http.StatusBadRequest, "Invalid File", err.Error())
 		return
 	}
 
 	data, err := h.service.DeleteFile(result.Url)
 
 	if err != nil {
-		response.Response(c, 500, "Internal Server Error", err.Error())
+		response.Response(c, http.StatusInternalServerError, "Internal Server Error", err.Error())
 		return
 	}
 
 	if err := h.service.DeleteAttachment(uint(attid)); err != nil {
-		response.Response(c, 500, "Internal Server Error", err.Error())
+		response.Response(c, http.StatusInternalServerError, "Internal Server Error", err.Error())
 		return
 	}
 
-	response.Response(c, 200, "Success", data)
+	response.Response(c, http.StatusOK, "Success", data)
 }

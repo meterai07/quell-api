@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"quell-api/entity"
 	"quell-api/models"
 	"quell-api/sdk/response"
@@ -20,13 +21,13 @@ func NewSavingHandler(savingService service.SavingService) *saving_handler {
 func (s *saving_handler) CreateSavingHandler(c *gin.Context) {
 	var body models.Saving
 	if err := c.ShouldBindJSON(&body); err != nil {
-		response.Response(c, 400, "failed when binding", nil)
+		response.Response(c, http.StatusBadRequest, "failed when binding", nil)
 		return
 	}
 
 	checkType := body.Type
 	if checkType != "income" && checkType != "expense" {
-		response.Response(c, 400, "failed when checking type", nil)
+		response.Response(c, http.StatusBadRequest, "failed when checking type", nil)
 		return
 	}
 
@@ -40,8 +41,8 @@ func (s *saving_handler) CreateSavingHandler(c *gin.Context) {
 	}
 	err := s.savingService.CreateSaving(newBody)
 	if err != nil {
-		response.Response(c, 500, "failed when create saving", nil)
+		response.Response(c, http.StatusInternalServerError, "failed when create saving", nil)
 		return
 	}
-	response.Response(c, 201, "success", nil)
+	response.Response(c, http.StatusOK, "success", nil)
 }

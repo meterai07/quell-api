@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"quell-api/entity"
 	"quell-api/sdk/response"
 
@@ -9,5 +10,5 @@ import (
 
 func GetUser(c *gin.Context) {
 	user := c.MustGet("user").(entity.User)
-	response.Response(c, 200, "success", user)
+	response.Response(c, http.StatusOK, "success", user)
 }

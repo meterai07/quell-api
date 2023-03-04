@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"quell-api/entity"
 	"quell-api/initializers"
@@ -16,7 +17,7 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err != nil {
-		response.Response(c, 401, "Unauthorized", nil)
+		response.Response(c, http.StatusUnauthorized, "Unauthorized", nil)
 		c.Abort()
 		return
 	}
@@ -29,14 +30,14 @@ func RequireAuth(c *gin.Context) {
 	})
 
 	if err != nil {
-		response.Response(c, 401, "Error when parsing the token", nil)
+		response.Response(c, http.StatusUnauthorized, "Error when parsing the token", nil)
 		c.Abort()
 		return
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			response.Response(c, 401, "Token expired", nil)
+			response.Response(c, http.StatusUnauthorized, "Token expired", nil)
 			c.Abort()
 			return
 		}
@@ -44,7 +45,7 @@ func RequireAuth(c *gin.Context) {
 		var user entity.User
 
 		if err := initializers.DB.Where("id = ?", claims["sub"]).First(&user).Error; err != nil {
-			response.Response(c, 401, "Unauthorized", nil)
+			response.Response(c, http.StatusUnauthorized, "Unauthorized", nil)
 			c.Abort()
 			return
 		}

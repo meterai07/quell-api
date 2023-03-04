@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
 	"net/smtp"
 	"os"
 	"quell-api/entity"
@@ -15,13 +16,13 @@ import (
 func (h *user_Handler) ValidateHandler(c *gin.Context) {
 	email := c.Query("email")
 	if email == "" {
-		response.Response(c, 400, "Invalid Email", nil)
+		response.Response(c, http.StatusBadRequest, "Invalid Email", nil)
 		c.Abort()
 		return
 	}
 	userToken := c.Query("token")
 	if userToken == "" {
-		response.Response(c, 400, "Invalid Token", nil)
+		response.Response(c, http.StatusBadRequest, "Invalid Token", nil)
 		c.Abort()
 		return
 	}
@@ -34,14 +35,14 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 	})
 
 	if err != nil {
-		response.Response(c, 400, err.Error(), nil)
+		response.Response(c, http.StatusBadRequest, err.Error(), nil)
 		c.Abort()
 		return
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		response.Response(c, 400, "Invalid Token", nil)
+		response.Response(c, http.StatusBadRequest, "Invalid Token", nil)
 		c.Abort()
 		return
 	}
@@ -50,19 +51,19 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 		var deleteUser entity.User
 		result, err := h.userService.GetUserByEmail(email)
 		if err != nil {
-			response.Response(c, 400, "Email not registered", nil)
+			response.Response(c, http.StatusBadRequest, "Email not registered", nil)
 			c.Abort()
 			return
 		}
 		deleteUser = result
 
 		if err := h.userService.DeleteUser(deleteUser); err != nil {
-			response.Response(c, 400, "Error deleting user", nil)
+			response.Response(c, http.StatusBadRequest, "Error deleting user", nil)
 			c.Abort()
 			return
 		}
 
-		response.Response(c, 400, "Token expired", nil)
+		response.Response(c, http.StatusBadRequest, "Token expired", nil)
 		c.Abort()
 		return
 	}
@@ -71,7 +72,7 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 
 	result, err := h.userService.GetUserByEmail(email)
 	if err != nil {
-		response.Response(c, 400, "Email not registered", nil)
+		response.Response(c, http.StatusBadRequest, "Email not registered", nil)
 		c.Abort()
 		return
 	}
@@ -80,12 +81,12 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 	user.IsActive = true
 
 	if err := h.userService.UpdateUser(user); err != nil {
-		response.Response(c, 400, "Error updating user", nil)
+		response.Response(c, http.StatusBadRequest, "Error updating user", nil)
 		c.Abort()
 		return
 	}
 
-	response.Response(c, 200, "Email validated", nil)
+	response.Response(c, http.StatusOK, "Email validated", nil)
 	c.Abort()
 }
 
