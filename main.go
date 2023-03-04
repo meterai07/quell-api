@@ -72,5 +72,6 @@ func main() {
 	v1.POST("/posts/:id/attachment", middlewares.RequireAuth, attachment_Handler.UploadFile)
 	v1.DELETE("/posts/:id/attachment/:attid", middlewares.RequireAuth, attachment_Handler.DeleteFile)
 
+	router.Use()
 	router.Run(":" + os.Getenv("PORT"))
 }
