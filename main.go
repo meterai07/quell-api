@@ -19,7 +19,10 @@ func init() {
 }
 
 func main() {
+<<<<<<< HEAD
 	// testing
+=======
+>>>>>>> 3dc1c004b1fcf2b820d28a8a5f37bb25e6c5aeec
 	// login, register, validate
 	user_Repository := repository.NewUserRepository(initializers.DB)
 	user_Service := service.NewUserService(user_Repository)
