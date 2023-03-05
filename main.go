@@ -19,6 +19,7 @@ func init() {
 }
 
 func main() {
+	// testing
 	// login, register, validate
 	user_Repository := repository.NewUserRepository(initializers.DB)
 	user_Service := service.NewUserService(user_Repository)
