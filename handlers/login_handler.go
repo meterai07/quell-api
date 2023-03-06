@@ -207,7 +207,7 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	if err := SendValidationEmail(body.Email, signedToken); err != nil { // kirim email verifikasi
+	if err := SendValidationEmail(body.Email, signedToken); err != nil {
 		response.Response(c, http.StatusInternalServerError, "Internal Server Error When Sending Email First Create Email", nil)
 		c.Abort()
 		return

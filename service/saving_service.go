@@ -9,6 +9,7 @@ import (
 type SavingService interface {
 	FindAll() ([]models.Saving, error)
 	FindById(id uint) (models.Saving, error)
+	GetTotalAmount(id uint) (int, error)
 	CreateSaving(saving entity.Saving) error
 	UpdateSaving(saving entity.Saving, id uint) error
 	DeleteSaving(id uint) error
@@ -28,6 +29,10 @@ func (s *savingService) FindAll() ([]models.Saving, error) {
 
 func (s *savingService) FindById(id uint) (models.Saving, error) {
 	return s.repository.FindById(id)
+}
+
+func (s *savingService) GetTotalAmount(id uint) (int, error) {
+	return s.repository.GetTotalAmount(id)
 }
 
 func (s *savingService) CreateSaving(saving entity.Saving) error {

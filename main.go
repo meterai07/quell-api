@@ -39,6 +39,10 @@ func main() {
 	attachment_Service := service.NewAttachmentService(attachment_Repository)
 	attachment_Handler := handlers.NewAttachmentHandler(attachment_Service)
 
+	saving_Repository := repository.NewSavingRepository(initializers.DB)
+	saving_Service := service.NewSavingService(saving_Repository)
+	saving_Handler := handlers.NewSavingHandler(saving_Service)
+
 	// payment_Repository := repository.NewPaymentRepository()
 	// payment_Service := service.NewPaymentService(payment_Repository)
 	// payment_Handler := handlers.NewPaymentHandler(payment_Service)
@@ -71,6 +75,9 @@ func main() {
 
 	v1.POST("/posts/:id/attachment", middlewares.RequireAuth, attachment_Handler.UploadFile)
 	v1.DELETE("/posts/:id/attachment/:attid", middlewares.RequireAuth, attachment_Handler.DeleteFile)
+
+	v1.POST("/saving", middlewares.RequireAuth, saving_Handler.CreateSavingHandler)
+	v1.GET("/saving", middlewares.RequireAuth, saving_Handler.GetTotalAmountHandler)
 
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

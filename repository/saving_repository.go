@@ -10,6 +10,7 @@ import (
 type SavingRepository interface {
 	FindAll() ([]models.Saving, error)
 	FindById(id uint) (models.Saving, error)
+	GetTotalAmount(id uint) (int, error)
 	CreateSaving(saving entity.Saving) error
 	UpdateSaving(saving entity.Saving, id uint) error
 	DeleteSaving(id uint) error
@@ -39,6 +40,15 @@ func (s *savingRepository) FindById(id uint) (models.Saving, error) {
 		return saving, result
 	}
 	return saving, nil
+}
+
+func (s *savingRepository) GetTotalAmount(id uint) (int, error) {
+	var totalAmount int
+	result := s.db.Table("savings").Where("user_id = ?", id).Select("SUM(amount)").Scan(&totalAmount).Error
+	if result != nil {
+		return totalAmount, result
+	}
+	return totalAmount, nil
 }
 
 func (s *savingRepository) CreateSaving(saving entity.Saving) error {

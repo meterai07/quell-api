@@ -10,5 +10,7 @@ func SyncDatabase() {
 		entity.Category{},
 		entity.Post{},
 		entity.Attachment{},
+		entity.Saving{},
+		entity.SavingCategory{},
 	)
 }
