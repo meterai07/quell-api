@@ -19,22 +19,18 @@ func init() {
 }
 
 func main() {
-	// login, register, validate
 	user_Repository := repository.NewUserRepository(initializers.DB)
 	user_Service := service.NewUserService(user_Repository)
 	user_Handler := handlers.NewUserHandler(user_Service)
 
-	// category, insert ,get, update, delete
 	category_Repository := repository.NewCategoryRepository(initializers.DB)
 	category_Service := service.NewCategoryService(category_Repository)
 	category_Handler := handlers.NewCategoryHandler(category_Service)
 
-	// post, insert, get, update, delete
 	post_Repository := repository.NewPostRepository(initializers.DB)
 	post_Service := service.NewPostService(post_Repository)
 	post_Handler := handlers.NewPostHandler(post_Service)
 
-	// upload, delete
 	attachment_Repository := repository.NewAttachmentRepository(initializers.SupabaseClient)
 	attachment_Service := service.NewAttachmentService(attachment_Repository)
 	attachment_Handler := handlers.NewAttachmentHandler(attachment_Service)
@@ -42,6 +38,10 @@ func main() {
 	saving_Repository := repository.NewSavingRepository(initializers.DB)
 	saving_Service := service.NewSavingService(saving_Repository)
 	saving_Handler := handlers.NewSavingHandler(saving_Service)
+
+	saving_Category_Repository := repository.NewSavingCategoryRepository(initializers.DB)
+	saving_Category_Service := service.NewSavingCategoryService(saving_Category_Repository)
+	saving_Category_Handler := handlers.NewSavingCategoryHandler(saving_Category_Service)
 
 	// payment_Repository := repository.NewPaymentRepository()
 	// payment_Service := service.NewPaymentService(payment_Repository)
@@ -71,7 +71,6 @@ func main() {
 	v1.POST("/posts", middlewares.RequireAuth, post_Handler.CreatePostHandler)
 	v1.PUT("/posts/:id", middlewares.RequireAuth, post_Handler.UpdatePostHandler)
 	v1.DELETE("/posts/:id", middlewares.RequireAuth, post_Handler.DeletePostHandler)
-	// v1.GET("/qris", middlewares.RequireAuth, payment_Handler.CreateQrisHandler)
 
 	v1.POST("/posts/:id/attachment", middlewares.RequireAuth, attachment_Handler.UploadFile)
 	v1.DELETE("/posts/:id/attachment/:attid", middlewares.RequireAuth, attachment_Handler.DeleteFile)
@@ -82,6 +81,12 @@ func main() {
 	v1.POST("/saving", middlewares.RequireAuth, saving_Handler.CreateSavingHandler)
 	v1.PUT("/saving/:id", middlewares.RequireAuth, saving_Handler.UpdateSavingHandler)
 	v1.DELETE("/saving/:id", middlewares.RequireAuth, saving_Handler.DeleteSavingHandler)
+
+	v1.GET("/savingcategory", middlewares.RequireAuth, saving_Category_Handler.GetSavingCategoryHandler)
+	v1.GET("/savingcategory/:id", middlewares.RequireAuth, saving_Category_Handler.GetSavingCategoryByIdHandler)
+	v1.POST("/savingcategory", middlewares.RequireAuth, saving_Category_Handler.CreateSavingCategoryHandler)
+	v1.PUT("/savingcategory/:id", middlewares.RequireAuth, saving_Category_Handler.UpdateSavingCategoryHandler)
+	v1.DELETE("/savingcategory/:id", middlewares.RequireAuth, saving_Category_Handler.DeleteSavingCategoryHandler)
 
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
