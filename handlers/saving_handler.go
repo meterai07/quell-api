@@ -19,6 +19,30 @@ func NewSavingHandler(savingService service.SavingService) *saving_handler {
 	return &saving_handler{savingService}
 }
 
+func (s *saving_handler) GetSavingHandler(c *gin.Context) {
+	result, err := s.savingService.FindAll()
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, "failed when get all saving", nil)
+		return
+	}
+	response.Response(c, http.StatusOK, "success", result)
+}
+
+func (s *saving_handler) GetSavingByIdHandler(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
+		return
+	}
+
+	result, err := s.savingService.FindById(uint(id))
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, "failed when get saving by id", nil)
+		return
+	}
+	response.Response(c, http.StatusOK, "success", result)
+}
+
 func (s *saving_handler) CreateSavingHandler(c *gin.Context) {
 	var body models.Saving
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -79,6 +103,21 @@ func (s *saving_handler) UpdateSavingHandler(c *gin.Context) {
 	err = s.savingService.UpdateSaving(newBody, uint(id))
 	if err != nil {
 		response.Response(c, http.StatusInternalServerError, "failed when update saving", nil)
+		return
+	}
+	response.Response(c, http.StatusOK, "success", nil)
+}
+
+func (s *saving_handler) DeleteSavingHandler(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
+		return
+	}
+
+	err = s.savingService.DeleteSaving(uint(id))
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, "failed when delete saving", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", nil)

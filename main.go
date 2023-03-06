@@ -76,8 +76,12 @@ func main() {
 	v1.POST("/posts/:id/attachment", middlewares.RequireAuth, attachment_Handler.UploadFile)
 	v1.DELETE("/posts/:id/attachment/:attid", middlewares.RequireAuth, attachment_Handler.DeleteFile)
 
+	v1.GET("/saving", middlewares.RequireAuth, saving_Handler.GetSavingHandler)
+	v1.GET("/saving/:id", middlewares.RequireAuth, saving_Handler.GetSavingByIdHandler)
+	v1.GET("/saving/totalamount", middlewares.RequireAuth, saving_Handler.GetTotalAmountHandler)
 	v1.POST("/saving", middlewares.RequireAuth, saving_Handler.CreateSavingHandler)
-	v1.GET("/saving", middlewares.RequireAuth, saving_Handler.GetTotalAmountHandler)
+	v1.PUT("/saving/:id", middlewares.RequireAuth, saving_Handler.UpdateSavingHandler)
+	v1.DELETE("/saving/:id", middlewares.RequireAuth, saving_Handler.DeleteSavingHandler)
 
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
