@@ -56,6 +56,12 @@ func (s *saving_handler) CreateSavingHandler(c *gin.Context) {
 		return
 	}
 
+	if checkType == "expense" {
+		if body.Amount > 0 {
+			body.Amount = body.Amount * -1
+		}
+	}
+
 	newBody := entity.Saving{
 		Name:             body.Name,
 		Description:      body.Description,

@@ -59,6 +59,7 @@ func main() {
 	v1.DELETE("/logout", middlewares.RequireAuth, handlers.LogoutHandler)
 
 	v1.GET("/user", middlewares.RequireAuth, handlers.GetUser)
+	v1.POST("/user", middlewares.RequireAuth, handlers.PremiumPayment)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
 	v1.GET("/category/:id", category_Handler.GetCategoryByIdHandler)

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"quell-api/entity"
 	"quell-api/models"
@@ -95,8 +94,6 @@ func (h *post_Handler) UpdatePostHandler(c *gin.Context) {
 		response.Response(c, http.StatusBadRequest, "failed when binding", nil)
 		return
 	}
-
-	fmt.Println(body)
 
 	if err := h.post_Service.UpdatePost(body, uint(id)); err != nil {
 		response.Response(c, http.StatusInternalServerError, "failed", nil)
