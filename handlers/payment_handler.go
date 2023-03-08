@@ -1,11 +1,10 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"quell-api/entity"
-	"quell-api/repository"
 	"quell-api/sdk/response"
+	"quell-api/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -13,11 +12,11 @@ import (
 )
 
 type PaymentHandler struct {
-	paymentService repository.PaymentRepository
+	paymentService service.PaymentService
 }
 
-func NewPaymentHandler(paymentService repository.PaymentRepository) *PaymentHandler {
-	return &PaymentHandler{paymentService}
+func NewPaymentHandler(paymentService service.PaymentService) *PaymentHandler {
+	return &PaymentHandler{paymentService: paymentService}
 }
 
 func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
@@ -40,7 +39,7 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 	}
 
 	transactionDetails = entity.TransactionDetailsContent{
-		Order_ID:     fmt.Sprintf("order %v", uuid.New()),
+		Order_ID:     uuid.New().String(),
 		Gross_Amount: ItemDetailsContent.Price * ItemDetailsContent.Quantity,
 	}
 
@@ -50,7 +49,7 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 		First_name: c.MustGet("user").(entity.User).Username,
 		Last_name:  "user",
 		Email:      c.MustGet("user").(entity.User).Email,
-		Phone:      "08123456789",
+		Phone:      c.MustGet("user").(entity.User).Phone,
 	}
 
 	gopay = entity.Gopay{
@@ -66,15 +65,26 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 		Transaction_details: transactionDetails,
 	}
 
-	result, err := p.paymentService.CreatePayment(payload)
+	result, err := p.paymentService.CreatePaymentMidTrans(payload)
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to create payment", err.Error())
 		return
 	}
 
-	response.Response(c, http.StatusOK, "success", result)
+	userTransaction := entity.UserTransaction{
+		GrossAmount: transactionDetails.Gross_Amount,
+		OrderID:     transactionDetails.Order_ID,
+		Status:      "PENDING",
+		UserID:      c.MustGet("user").(entity.User).ID,
+	}
 
-	// result disimpan didalam database
+	err = p.paymentService.CreatePayment(userTransaction)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to create user transaction", err.Error())
+		return
+	}
+
+	response.Response(c, http.StatusOK, "success", result)
 }
 
 func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {

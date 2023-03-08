@@ -194,6 +194,7 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 		Username: body.Username,
 		Email:    body.Email,
 		Password: string(hashedPassword),
+		Phone:    body.Phone,
 		IsActive: false,
 		Token:    signedToken,
 	}

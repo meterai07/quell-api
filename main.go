@@ -43,9 +43,9 @@ func main() {
 	saving_Category_Service := service.NewSavingCategoryService(saving_Category_Repository)
 	saving_Category_Handler := handlers.NewSavingCategoryHandler(saving_Category_Service)
 
-	payment_Repository := repository.NewPaymentRepository("gojek")
-	// payment_Service := service.NewPaymentService(payment_Repository)
-	payment_Handler := handlers.NewPaymentHandler(payment_Repository)
+	payment_Repository := repository.NewPaymentRepository(initializers.DB, "gojek")
+	payment_Service := service.NewPaymentService(payment_Repository)
+	payment_Handler := handlers.NewPaymentHandler(payment_Service)
 
 	// category, insert ,get, update, delete
 
@@ -60,7 +60,7 @@ func main() {
 
 	v1.GET("/user", middlewares.RequireAuth, handlers.GetUser)
 	v1.POST("/user/subscribe", middlewares.RequireAuth, payment_Handler.PremiumPayment)
-	v1.POST("/user/subscribe/validate", middlewares.RequireAuth, payment_Handler.PremiumPaymentValidate)
+	// v1.POST("/user/subscribe/validate", middlewares.RequireAuth, payment_Handler.PremiumPaymentValidate)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
 	v1.GET("/category/:id", category_Handler.GetCategoryByIdHandler)
