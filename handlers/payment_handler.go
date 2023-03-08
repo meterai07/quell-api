@@ -27,15 +27,22 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 	var gopay entity.Gopay
 	var payload entity.Payload
 
-	if err := c.ShouldBindJSON(&ItemDetailsContent); err != nil {
-		response.Response(c, http.StatusBadRequest, "Failed to bind json", nil)
-		return
-	}
+	// if err := c.ShouldBindJSON(&ItemDetailsContent); err != nil {
+	// 	response.Response(c, http.StatusBadRequest, "Failed to bind json", nil)
+	// 	return
+	// }
 
-	if err := validator.New().Struct(&ItemDetailsContent); err != nil {
-		validationError := err.(validator.ValidationErrors)
-		response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
-		return
+	// if err := validator.New().Struct(&ItemDetailsContent); err != nil {
+	// 	validationError := err.(validator.ValidationErrors)
+	// 	response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
+	// 	return
+	// }
+
+	ItemDetailsContent = entity.ItemDetailsContent{
+		ID:       uuid.New().String(),
+		Name:     "Premium",
+		Price:    15000,
+		Quantity: 1,
 	}
 
 	transactionDetails = entity.TransactionDetailsContent{
