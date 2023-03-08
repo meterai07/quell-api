@@ -43,9 +43,9 @@ func main() {
 	saving_Category_Service := service.NewSavingCategoryService(saving_Category_Repository)
 	saving_Category_Handler := handlers.NewSavingCategoryHandler(saving_Category_Service)
 
-	// payment_Repository := repository.NewPaymentRepository()
+	payment_Repository := repository.NewPaymentRepository("gojek")
 	// payment_Service := service.NewPaymentService(payment_Repository)
-	// payment_Handler := handlers.NewPaymentHandler(payment_Service)
+	payment_Handler := handlers.NewPaymentHandler(payment_Repository)
 
 	// category, insert ,get, update, delete
 
@@ -59,7 +59,7 @@ func main() {
 	v1.DELETE("/logout", middlewares.RequireAuth, handlers.LogoutHandler)
 
 	v1.GET("/user", middlewares.RequireAuth, handlers.GetUser)
-	v1.POST("/user", middlewares.RequireAuth, handlers.PremiumPayment)
+	v1.POST("/user/premium", middlewares.RequireAuth, payment_Handler.PremiumPayment)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
 	v1.GET("/category/:id", category_Handler.GetCategoryByIdHandler)

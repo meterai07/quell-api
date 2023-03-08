@@ -13,3 +13,9 @@ type User struct {
 	Token    string `gorm:"unique;not null"`
 	Posts    []Post `gorm:"foreignKey:UserID"`
 }
+
+// type UserTransaction struct {
+// 	gorm.Model
+// 	UserID uint
+// 	Amount int
+// }

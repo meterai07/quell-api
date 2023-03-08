@@ -36,12 +36,16 @@ func (r *paymentRepository) CreatePayment(payment entity.Payload) (interface{}, 
 		return nil, err
 	}
 
+	fmt.Println(string(data))
+
 	payload := strings.NewReader(string(data))
 
 	req, err := http.NewRequest("POST", "https://api.sandbox.midtrans.com/v2/charge", payload)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(req)
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
@@ -50,6 +54,8 @@ func (r *paymentRepository) CreatePayment(payment entity.Payload) (interface{}, 
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(res)
 
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)

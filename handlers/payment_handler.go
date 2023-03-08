@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"quell-api/entity"
 	"quell-api/repository"
 	"quell-api/sdk/response"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type PaymentHandler struct {
@@ -17,46 +20,59 @@ func NewPaymentHandler(paymentService repository.PaymentRepository) *PaymentHand
 	return &PaymentHandler{paymentService}
 }
 
-func PremiumPayment(c *gin.Context) {
-	var transactionDetails entity.TransactionDetails
+func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
+	var listData []entity.ItemDetailsContent
+	var ItemDetailsContent entity.ItemDetailsContent
+	var transactionDetails entity.TransactionDetailsContent
+	var customerDetails entity.CustomerDetails
+	var gopay entity.Gopay
+	var payload entity.Payload
 
-	if err := c.ShouldBindJSON(&transactionDetails); err != nil {
+	if err := c.ShouldBindJSON(&ItemDetailsContent); err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to bind json", nil)
+		return
 	}
 
-}
+	if err := validator.New().Struct(&ItemDetailsContent); err != nil {
+		validationError := err.(validator.ValidationErrors)
+		response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
+		return
+	}
 
-func (p *PaymentHandler) NewPaymentHandler(c *gin.Context) {
-	// var payload entity.Payload
+	transactionDetails = entity.TransactionDetailsContent{
+		Order_ID:     fmt.Sprintf("order %v", uuid.New()),
+		Gross_Amount: ItemDetailsContent.Price * ItemDetailsContent.Quantity,
+	}
 
-	// paymentType := c.Query("paymentType")
-	// customer := entity.Customer{
-	// 	Email: c.MustGet("user").(entity.User).Email,
-	// 	Name:  c.MustGet("user").(entity.User).Username,
-	// }
+	listData = append(listData, ItemDetailsContent)
 
-	// var transaction entity.Transaction
+	customerDetails = entity.CustomerDetails{
+		First_name: c.MustGet("user").(entity.User).Username,
+		Last_name:  "user",
+		Email:      c.MustGet("user").(entity.User).Email,
+		Phone:      "08123456789",
+	}
 
-	// gopayContent := map[string]any{}
-	// shopeepayContent := map[string]any{}
-	// if paymentType == "gopay" {
-	// 	gopayContent["enable_callback"] = true
-	// 	gopayContent["callback_url"] = "https://midtrans.com"
-	// } else if paymentType == "shopeepay" {
-	// 	shopeepayContent["enable_callback"] = true
-	// 	shopeepayContent["callback_url"] = "https://midtrans.com"
-	// }
+	gopay = entity.Gopay{
+		Enable_callback: true,
+		Callback_url:    "https://midtrans.com",
+	}
 
-	// payload = entity.Payload{
-	// 	PaymentType: paymentType,
-	// 	TransactionDetails: ,
-	// 	Itemdetails: ,
-	// 	CustomerDetails: customer,
+	payload = entity.Payload{
+		Customer_details:    customerDetails,
+		Gopay:               gopay,
+		Item_details:        listData,
+		Payment_type:        "gopay",
+		Transaction_details: transactionDetails,
+	}
 
-	// result, err := p.paymentService.CreatePayment(payload)
-	// if err != nil {
-	// 	response.Response(c, http.StatusBadRequest, "Failed to create payment", nil)
-	// }
+	result, err := p.paymentService.CreatePayment(payload)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to create payment", err.Error())
+		return
+	}
 
-	// response.Response(c, http.StatusOK, "success", result)
+	response.Response(c, http.StatusOK, "success", result)
+
+	// result disimpan didalam database
 }
