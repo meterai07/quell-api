@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"quell-api/entity"
+	"quell-api/sdk/crypto"
 	"quell-api/sdk/response"
 	"quell-api/service"
 
@@ -26,17 +28,6 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 	var customerDetails entity.CustomerDetails
 	var gopay entity.Gopay
 	var payload entity.Payload
-
-	// if err := c.ShouldBindJSON(&ItemDetailsContent); err != nil {
-	// 	response.Response(c, http.StatusBadRequest, "Failed to bind json", nil)
-	// 	return
-	// }
-
-	// if err := validator.New().Struct(&ItemDetailsContent); err != nil {
-	// 	validationError := err.(validator.ValidationErrors)
-	// 	response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
-	// 	return
-	// }
 
 	ItemDetailsContent = entity.ItemDetailsContent{
 		ID:       uuid.New().String(),
@@ -109,11 +100,17 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	// result, err := p.paymentService.FindById(validatePayment.OrderID)
-
 	result, err := p.paymentService.FindById(validatePayment.OrderID)
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to find order id", err.Error())
+		return
+	}
+
+	makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
+	encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
+
+	if encodeSignatureKey != validatePayment.SignatureKey {
+		response.Response(c, http.StatusBadRequest, "Failed to validate signature key", nil)
 		return
 	}
 

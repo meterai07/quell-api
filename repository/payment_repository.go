@@ -3,7 +3,6 @@ package repository
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -93,8 +92,6 @@ func (r *paymentRepository) CreatePaymentMidTrans(payment entity.Payload) (inter
 		return nil, err
 	}
 
-	fmt.Println(string(data))
-
 	payload := strings.NewReader(string(data))
 
 	req, err := http.NewRequest("POST", "https://api.sandbox.midtrans.com/v2/charge", payload)
@@ -102,17 +99,13 @@ func (r *paymentRepository) CreatePaymentMidTrans(payment entity.Payload) (inter
 		return nil, err
 	}
 
-	fmt.Println(req)
-
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(os.Getenv("SERVER_KEY")))))
+	req.Header.Add("Authorization", base64.StdEncoding.EncodeToString([]byte(os.Getenv("SERVER_KEY"))))
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(res)
 
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
