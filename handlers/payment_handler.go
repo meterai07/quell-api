@@ -108,6 +108,10 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 
 	makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
 	encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to encode signature key", err.Error())
+		return
+	}
 
 	if encodeSignatureKey != validatePayment.SignatureKey {
 		response.Response(c, http.StatusBadRequest, "Failed to validate signature key", nil)
