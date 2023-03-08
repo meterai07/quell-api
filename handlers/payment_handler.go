@@ -76,3 +76,19 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 
 	// result disimpan didalam database
 }
+
+func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
+	// endpoint ketika transaksi telah dibayar
+	var validatePayment entity.ValidatePayment
+
+	if err := c.ShouldBindJSON(&validatePayment); err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to bind json", nil)
+		return
+	}
+
+	if err := validator.New().Struct(&validatePayment); err != nil {
+		validationError := err.(validator.ValidationErrors)
+		response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
+		return
+	}
+}

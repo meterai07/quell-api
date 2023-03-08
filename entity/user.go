@@ -14,8 +14,8 @@ type User struct {
 	Posts    []Post `gorm:"foreignKey:UserID"`
 }
 
-// type UserTransaction struct {
-// 	gorm.Model
-// 	UserID uint
-// 	Amount int
-// }
+type UserTransaction struct {
+	gorm.Model
+	UserID uint
+	Amount int
+}

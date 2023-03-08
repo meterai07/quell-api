@@ -30,3 +30,14 @@ type Payload struct {
 	Payment_type        string                    `json:"payment_type"`
 	Transaction_details TransactionDetailsContent `json:"transaction_details"`
 }
+
+type ValidatePayment struct {
+	TransactionTime string `json:"transaction_time"`
+	TransactionID   string `json:"transaction_id"`
+	StatusCode      string `json:"status_code"`
+	GrossAmount     string `json:"gross_amount"`
+	ServerKey       string `json:"server_key"`
+	SignatureKey    string `json:"signature_key"`
+	OrderID         string `json:"order_id"`
+	ChannelResponse string `json:"channel_response_message"`
+}
