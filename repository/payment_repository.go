@@ -15,7 +15,7 @@ import (
 
 type PaymentRepository interface {
 	FindAll() ([]entity.UserTransaction, error)
-	FindById(id uint) (entity.UserTransaction, error)
+	FindById(id string) (entity.UserTransaction, error)
 	CreatePayment(payment entity.UserTransaction) error
 	UpdatePayment(payment entity.UserTransaction, id uint) error
 	DeletePayment(id uint) error
@@ -43,7 +43,7 @@ func (r *paymentRepository) FindAll() ([]entity.UserTransaction, error) {
 	return payments, nil
 }
 
-func (r *paymentRepository) FindById(id uint) (entity.UserTransaction, error) {
+func (r *paymentRepository) FindById(id string) (entity.UserTransaction, error) {
 	var payment entity.UserTransaction
 	result := r.db.Where("id = ?", id).First(&payment).Error
 	if result != nil {

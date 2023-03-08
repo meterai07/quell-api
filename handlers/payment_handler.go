@@ -108,4 +108,23 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
 		return
 	}
+
+	// result, err := p.paymentService.FindById(validatePayment.OrderID)
+
+	result, err := p.paymentService.FindById(validatePayment.OrderID)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to find order id", err.Error())
+		return
+	}
+
+	if validatePayment.ChannelResponse == "Approved" {
+		result.Status = "SUCCESS"
+	} else {
+		result.Status = "FAILED"
+	}
+
+	if err := p.paymentService.UpdatePayment(result, result.ID); err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to update payment", err.Error())
+		return
+	}
 }

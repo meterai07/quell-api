@@ -7,7 +7,7 @@ import (
 
 type PaymentService interface {
 	FindAll() ([]entity.UserTransaction, error)
-	FindById(id uint) (entity.UserTransaction, error)
+	FindById(id string) (entity.UserTransaction, error)
 	CreatePayment(payment entity.UserTransaction) error
 	UpdatePayment(payment entity.UserTransaction, id uint) error
 	DeletePayment(id uint) error
@@ -26,7 +26,7 @@ func (s *paymentService) FindAll() ([]entity.UserTransaction, error) {
 	return s.repository.FindAll()
 }
 
-func (s *paymentService) FindById(id uint) (entity.UserTransaction, error) {
+func (s *paymentService) FindById(id string) (entity.UserTransaction, error) {
 	return s.repository.FindById(id)
 }
 
