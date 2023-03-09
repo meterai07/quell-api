@@ -105,6 +105,5 @@ func SendValidationEmail(email string, token string) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
