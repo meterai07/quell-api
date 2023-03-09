@@ -7,6 +7,7 @@ import (
 	"quell-api/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
@@ -91,13 +92,11 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	response.Response(c, http.StatusOK, "success", validatePayment)
-
-	// if err := validator.New().Struct(&validatePayment); err != nil {
-	// 	validationError := err.(validator.ValidationErrors)
-	// 	response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
-	// 	return
-	// }
+	if err := validator.New().Struct(&validatePayment); err != nil {
+		validationError := err.(validator.ValidationErrors)
+		response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
+		return
+	}
 
 	// result, err := p.paymentService.FindById(validatePayment.OrderID)
 	// if err != nil {
