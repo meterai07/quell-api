@@ -98,11 +98,11 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	// result, err := p.paymentService.FindById(validatePayment.OrderID)
-	// if err != nil {
-	// 	response.Response(c, http.StatusBadRequest, "Failed to find order id", err.Error())
-	// 	return
-	// }
+	_, err := p.paymentService.FindById(validatePayment.OrderID)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to find order id", err.Error())
+		return
+	}
 
 	// makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
 	// encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
