@@ -106,6 +106,7 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
+	// masalah disini
 	makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
 	encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
 	if err != nil {
