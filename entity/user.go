@@ -11,6 +11,7 @@ type User struct {
 	Password         string            `gorm:"not null" validate:"required,min=8"`
 	Phone            string            `gorm:"unique;not null" validate:"required,min=10,max=13"`
 	IsActive         bool              `gorm:"default:false"`
+	IsPremium        bool              `gorm:"default:false"`
 	Token            string            `gorm:"unique;not null"`
 	Posts            []Post            `gorm:"foreignKey:UserID"`
 	UserTransactions []UserTransaction `gorm:"foreignKey:UserID"`

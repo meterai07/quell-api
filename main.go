@@ -50,6 +50,12 @@ func main() {
 	// category, insert ,get, update, delete
 
 	router := gin.Default()
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
 	v1 := router.Group("/api/v1")
 
 	v1.POST("/login", user_Handler.LoginHandler)
@@ -60,7 +66,8 @@ func main() {
 
 	v1.GET("/user", middlewares.RequireAuth, handlers.GetUser)
 	v1.GET("/user/subscribe", middlewares.RequireAuth, payment_Handler.PremiumPayment)
-	v1.POST("/user/subscribe/validate", middlewares.RequireAuth, payment_Handler.PremiumPaymentValidate)
+	// v1.POST("/user/subscribe/validate", middlewares.RequireAuth, payment_Handler.PremiumPaymentValidate)
+	v1.POST("webhook.site/842d1a6d-2924-47ed-b7e0-9cc32ab2538b", middlewares.RequireAuth, payment_Handler.PremiumPaymentValidate)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
 	v1.GET("/category/:id", category_Handler.GetCategoryByIdHandler)
