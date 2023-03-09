@@ -89,24 +89,6 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 	// endpoint ketika transaksi telah dibayar
 	var validatePayment entity.ValidatePayment
 
-	// type validatePaymentStruct struct {
-	// 	transactionTime   string `json:"transaction_time"`
-	// 	transactionStatus string `json:"transaction_status"`
-	// 	transactionID     string `json:"transaction_id"`
-	// 	statusMessage     string `json:"status_message"`
-	// 	statusCode        string `json:"status_code"`
-	// 	signatureKey      string `json:"signature_key"`
-	// 	paymenType        string `json:"payment_type"`
-	// 	orderID           string `json:"order_id"`
-	// 	merchantID        string `json:"merchant_id"`
-	// 	grossAmount       string `json:"gross_amount"`
-	// 	fraudStatus       string `json:"fraud_status"`
-	// 	expiryTime        string `json:"expiry_time"`
-	// 	currency          string `json:"currency"`
-	// }
-
-	// var validatePayment validatePayment
-
 	if err := c.ShouldBindJSON(&validatePayment); err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to bind json", nil)
 		return
@@ -136,7 +118,7 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	if validatePayment.ChannelResponse == "Approved" {
+	if validatePayment.SignatureKey != "" {
 		result.Status = "SUCCESS"
 	} else {
 		result.Status = "FAILED"
