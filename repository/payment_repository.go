@@ -44,7 +44,7 @@ func (r *paymentRepository) FindAll() ([]entity.UserTransaction, error) {
 
 func (r *paymentRepository) FindById(id string) (entity.UserTransaction, error) {
 	var payment entity.UserTransaction
-	result := r.db.Where("id = ?", id).First(&payment).Error
+	result := r.db.Where("OrderID = ?", id).First(&payment).Error
 	if result != nil {
 		return payment, result
 	}
