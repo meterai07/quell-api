@@ -66,7 +66,7 @@ func main() {
 
 	v1.GET("/user", middlewares.RequireAuth, handlers.GetUser)
 	v1.GET("/user/subscribe", middlewares.RequireAuth, payment_Handler.PremiumPayment)
-	v1.POST("/user/subscribe/validate", payment_Handler.PremiumPaymentValidate)
+	v1.POST("/subscribe/validate", payment_Handler.PremiumPaymentValidate)
 	// v1.POST("/subscribe/validate", handlers.ValidatePayment)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
