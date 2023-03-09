@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"quell-api/entity"
+	"quell-api/sdk/crypto"
 	"quell-api/sdk/response"
 	"quell-api/service"
 
@@ -104,17 +106,17 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	// makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
-	// encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
-	// if err != nil {
-	// 	response.Response(c, http.StatusBadRequest, "Failed to encode signature key", err.Error())
-	// 	return
-	// }
+	makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
+	encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to encode signature key", err.Error())
+		return
+	}
 
-	// if err := crypto.CompareHash(encodeSignatureKey, validatePayment.SignatureKey); err != nil {
-	// 	response.Response(c, http.StatusBadRequest, "Failed to validate signature key", err.Error())
-	// 	return
-	// }
+	if err := crypto.CompareHash(encodeSignatureKey, validatePayment.SignatureKey); err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to validate signature key", err.Error())
+		return
+	}
 
 	// result.Status = "SUCCESS"
 
