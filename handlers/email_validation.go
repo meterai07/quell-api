@@ -99,7 +99,7 @@ func SendValidationEmail(email string, token string) error {
 	auth := smtp.PlainAuth("", from, password, host)
 
 	msg := fmt.Sprintf(
-		"From: %s\r\nTo: %s\r\nSubject: Email Validation\r\n\r\nDear User,\r\nThank you for registering with our service. To activate your account, please use the following validation token:\r\nLink: http://localhost:%s/api/v1/register/validate?email=%s&token=%s\r\nPlease enter this token on the validation page to complete your registration\r\n\r\nThank you for your cooperation\r\nQuill", from, email, os.Getenv("PORT"), email, token)
+		"From: %s\r\nTo: %s\r\nSubject: Email Validation\r\n\r\nDear User,\r\nThank you for registering with our service. To activate your account, please use the following validation token:\r\nLink: https://quell-api-production.up.railway.app/api/v1/register/validate?email=%s&token=%s\r\nPlease enter this token on the validation page to complete your registration\r\n\r\nThank you for your cooperation\r\nQuill", from, email, email, token)
 
 	err := smtp.SendMail(host+":"+port, auth, from, []string{email}, []byte(msg))
 	if err != nil {
