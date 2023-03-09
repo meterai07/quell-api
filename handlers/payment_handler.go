@@ -91,6 +91,8 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
+	response.Response(c, http.StatusOK, "success", validatePayment)
+
 	// if err := validator.New().Struct(&validatePayment); err != nil {
 	// 	validationError := err.(validator.ValidationErrors)
 	// 	response.Response(c, http.StatusBadRequest, validationError.Error(), nil)
