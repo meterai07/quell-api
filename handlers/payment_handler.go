@@ -19,7 +19,10 @@ type PaymentHandler struct {
 }
 
 func NewPaymentHandler(paymentService service.PaymentService, userService service.Service) *PaymentHandler {
-	return &PaymentHandler{paymentService: paymentService}
+	return &PaymentHandler{
+		paymentService: paymentService,
+		userService:    userService,
+	}
 }
 
 func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
@@ -134,29 +137,18 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		}
 
 		if result.Status == "SUCCESS" {
-			var updateuser entity.User
-
 			user, err := p.userService.GetUserByID(result.UserID)
 			if err != nil {
 				response.Response(c, http.StatusBadRequest, "Failed to get user", err.Error())
 				return
 			}
-			updateuser = user
 
-			updateuser.IsPremium = true
+			user.IsPremium = true
 
-			if err := p.userService.UpdateUser(updateuser); err != nil {
+			if err := p.userService.UpdateUser(user); err != nil {
 				response.Response(c, http.StatusBadRequest, "Failed to update user", err.Error())
 				return
 			}
-
-			// result2, err := p.userService.GetUserByID(result.UserID)
-			// if err != nil {
-			// 	response.Response(c, http.StatusBadRequest, "Failed to get user", err.Error())
-			// 	return
-			// }
-
-			// response.Response(c, http.StatusOK, "success", result2)
 		}
 	}
 }
