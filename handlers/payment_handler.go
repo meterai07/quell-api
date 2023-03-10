@@ -146,6 +146,14 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 				response.Response(c, http.StatusBadRequest, "Failed to update user", err.Error())
 				return
 			}
+
+			result2, err := p.userService.GetUserByID(result.UserID)
+			if err != nil {
+				response.Response(c, http.StatusBadRequest, "Failed to get user", err.Error())
+				return
+			}
+
+			response.Response(c, http.StatusOK, "success", result2)
 		}
 	}
 }
