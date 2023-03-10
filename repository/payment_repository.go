@@ -13,7 +13,7 @@ import (
 )
 
 type PaymentRepository interface {
-	FindAll() ([]entity.UserTransaction, error)
+	FindAll(id uint) ([]entity.UserTransaction, error)
 	FindById(id string) (entity.UserTransaction, error)
 	CreatePayment(payment entity.UserTransaction) error
 	UpdatePayment(payment entity.UserTransaction, id uint) error
@@ -33,9 +33,9 @@ func NewPaymentRepository(db *gorm.DB, typePayment string) *paymentRepository {
 	}
 }
 
-func (r *paymentRepository) FindAll() ([]entity.UserTransaction, error) {
+func (r *paymentRepository) FindAll(id uint) ([]entity.UserTransaction, error) {
 	var payments []entity.UserTransaction
-	result := r.db.Find(&payments).Error
+	result := r.db.Where("user_id = ?", id).Find(&payments).Error
 	if result != nil {
 		return payments, result
 	}

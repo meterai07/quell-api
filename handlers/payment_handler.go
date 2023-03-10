@@ -129,7 +129,9 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 }
 
 func (p *PaymentHandler) GetTransaction(c *gin.Context) {
-	result, err := p.paymentService.FindAll()
+	id := c.MustGet("user").(entity.User).ID
+
+	result, err := p.paymentService.FindAll(id)
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to get transaction", err.Error())
 		return
