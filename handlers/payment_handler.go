@@ -133,10 +133,8 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 			return
 		}
 
-		response.Response(c, http.StatusOK, "success", result)
-
 		if result.Status == "SUCCESS" {
-			user, err := p.userService.GetUserByID(c.MustGet("user").(entity.User).ID)
+			user, err := p.userService.GetUserByID(result.UserID)
 			if err != nil {
 				response.Response(c, http.StatusBadRequest, "Failed to get user", err.Error())
 				return
