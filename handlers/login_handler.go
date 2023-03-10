@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"quell-api/entity"
@@ -13,16 +14,21 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 )
 
 type user_Handler struct {
 	userService service.Service
+	postService service.PostService
 }
 
-func NewUserHandler(userService service.Service) *user_Handler {
-	return &user_Handler{userService: userService}
+func NewUserHandler(userService service.Service, postService service.PostService) *user_Handler {
+	return &user_Handler{
+		userService: userService,
+		postService: postService,
+	}
 }
 
 func (h *user_Handler) LoginHandler(c *gin.Context) {
@@ -66,6 +72,39 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 	if err != nil {
 		response.Response(c, http.StatusInternalServerError, "Error while signing the token", nil)
 		return
+	}
+
+	if user.IsPremium {
+		s := gocron.NewScheduler(time.UTC)
+
+		s.Every(5).Second().Do(func() {
+			posts, err := h.postService.FindAllPostsByUserID(user.ID)
+			if err != nil {
+				response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+				return
+			}
+
+			for _, post := range posts {
+				if post.Type == "jadwal" || post.Type == "tugas" {
+					deadline := post.Date
+					now := time.Now()
+
+					if deadline.After(now) {
+						duration := deadline.Sub(now)
+						if time.Duration(duration.Hours()) < 7*time.Hour && deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
+							fmt.Println("Reminder activated for ", post.ID)
+						}
+					}
+				}
+			}
+		})
+
+		// s.Every(5).Second().Do(func(p *post_Handler) {
+		// 	fmt.Println("masuk")
+		// 	p.ActivateReminder(c)
+		// })
+
+		s.StartAsync()
 	}
 
 	c.SetSameSite(http.SameSiteNoneMode)

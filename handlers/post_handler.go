@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"quell-api/entity"
 	"quell-api/models"
@@ -15,13 +14,11 @@ import (
 
 type post_Handler struct {
 	post_Service service.PostService
-	user_Service service.Service
 }
 
-func NewPostHandler(post_Service service.PostService, user_Service service.Service) *post_Handler {
+func NewPostHandler(post_Service service.PostService) *post_Handler {
 	return &post_Handler{
 		post_Service,
-		user_Service,
 	}
 }
 
@@ -124,38 +121,29 @@ func (h *post_Handler) DeletePostHandler(c *gin.Context) {
 	response.Response(c, http.StatusOK, "success", nil)
 }
 
-func (h *post_Handler) ActivateReminder(c *gin.Context) {
-	user, err := h.user_Service.GetUserByID(c.MustGet("user").(entity.User).ID)
-	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when find user", nil)
-		return
-	}
+// func (h *post_Handler) ActivateReminder(c *gin.Context) {
+// 	posts, err := h.post_Service.FindAllPostsByUserID(c.MustGet("user").(entity.User).ID)
+// 	if err != nil {
+// 		response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+// 		return
+// 	}
 
-	if !user.IsPremium {
-		response.Response(c, http.StatusBadRequest, "user is not premium to activate this feature", nil)
-		return
-	}
+// 	for _, post := range posts {
+// 		if post.Type == "jadwal" || post.Type == "tugas" {
+// 			deadline := post.Date
+// 			now := time.Now()
 
-	posts, err := h.post_Service.FindAllPostsByUserID(c.MustGet("user").(entity.User).ID)
-	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
-		return
-	}
+// 			if deadline.After(now) {
+// 				fmt.Println("Year: ", deadline.Year(), "Month: ", deadline.Month(), "Day: ", deadline.Day(), "Hour: ", deadline.Hour(), "Minute: ", deadline.Minute(), "Second: ", deadline.Second())
 
-	for _, post := range posts {
-		if post.Type == "jadwal" || post.Type == "tugas" {
-			deadline := post.Date
-			now := time.Now()
-
-			fmt.Println("Deadline:", deadline)
-			fmt.Println("Now:", now)
-
-			if deadline.After(now) {
-				fmt.Println("Deadline is later than now")
-			} else {
-				fmt.Println("Deadline has passed")
-			}
-		}
-	}
-
-}
+// 				duration := deadline.Sub(now)
+// 				if time.Duration(duration.Hours()) < 7*time.Hour {
+// 					if deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
+// 						fmt.Println("Reminder activated for ", post.ID)
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	// s.StartBlocking()
+// }
