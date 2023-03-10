@@ -45,7 +45,7 @@ func main() {
 
 	payment_Repository := repository.NewPaymentRepository(initializers.DB, "gojek")
 	payment_Service := service.NewPaymentService(payment_Repository)
-	payment_Handler := handlers.NewPaymentHandler(payment_Service)
+	payment_Handler := handlers.NewPaymentHandler(payment_Service, user_Service)
 
 	// category, insert ,get, update, delete
 

@@ -15,9 +15,10 @@ import (
 
 type PaymentHandler struct {
 	paymentService service.PaymentService
+	userService    service.Service
 }
 
-func NewPaymentHandler(paymentService service.PaymentService) *PaymentHandler {
+func NewPaymentHandler(paymentService service.PaymentService, userService service.Service) *PaymentHandler {
 	return &PaymentHandler{paymentService: paymentService}
 }
 
@@ -124,6 +125,27 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		if err := p.paymentService.UpdatePayment(result, result.ID); err != nil {
 			response.Response(c, http.StatusBadRequest, "Failed to update payment", err.Error())
 			return
+		}
+
+		result, err := p.paymentService.FindById(validatePayment.OrderID)
+		if err != nil {
+			response.Response(c, http.StatusBadRequest, "Failed to find order id", err.Error())
+			return
+		}
+
+		if result.Status == "SUCCESS" {
+			user, err := p.userService.GetUserByID(c.MustGet("user").(entity.User).ID)
+			if err != nil {
+				response.Response(c, http.StatusBadRequest, "Failed to get user", err.Error())
+				return
+			}
+
+			user.IsPremium = true
+
+			if err := p.userService.UpdateUser(user); err != nil {
+				response.Response(c, http.StatusBadRequest, "Failed to update user", err.Error())
+				return
+			}
 		}
 	}
 }

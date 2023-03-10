@@ -8,6 +8,7 @@ import (
 type Service interface {
 	CreateUser(user entity.User) error
 	GetUserByEmail(email string) (entity.User, error)
+	GetUserByID(id uint) (entity.User, error)
 	FindUserByEmail(email string) bool
 	UpdateUser(user entity.User) error
 	DeleteUser(user entity.User) error
@@ -34,6 +35,15 @@ func (s *userService) CreateUser(user entity.User) error {
 func (s *userService) GetUserByEmail(email string) (entity.User, error) {
 	var user entity.User
 	result, err := s.repository.GetUserByEmail(email)
+	if err != nil {
+		return user, err
+	}
+	return result, nil
+}
+
+func (s *userService) GetUserByID(id uint) (entity.User, error) {
+	var user entity.User
+	result, err := s.repository.GetUserByID(id)
 	if err != nil {
 		return user, err
 	}

@@ -10,6 +10,7 @@ type UserRepository interface {
 	CreateUser(user entity.User) error
 	GetUserByEmail(email string) (entity.User, error)
 	FindUserByEmail(email string) bool
+	GetUserByID(id uint) (entity.User, error)
 	UpdateUser(user entity.User) error
 	DeleteUser(user entity.User) error
 }
@@ -43,6 +44,15 @@ func (r *userRepository) FindUserByEmail(email string) bool {
 	var user entity.User
 	result := r.DB.Where("email = ?", email).First(&user).Error
 	return result == nil
+}
+
+func (r *userRepository) GetUserByID(id uint) (entity.User, error) {
+	var user entity.User
+	result := r.DB.Where("id = ?", id).First(&user).Error
+	if result != nil {
+		return user, result
+	}
+	return user, nil
 }
 
 func (r *userRepository) UpdateUser(user entity.User) error {
