@@ -9,6 +9,7 @@ import (
 
 type PostRepository interface {
 	FindAll() ([]entity.Post, error)
+	FindAllPostsByUserID(id uint) ([]entity.Post, error)
 	FindById(id uint) (entity.Post, error)
 	CreatePost(post entity.Post) error
 	UpdatePost(post models.Post_Upload, id uint) error
@@ -26,6 +27,15 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 func (r *postRepository) FindAll() ([]entity.Post, error) {
 	var posts []entity.Post
 	result := r.db.Find(&posts).Error
+	if result != nil {
+		return posts, result
+	}
+	return posts, nil
+}
+
+func (r *postRepository) FindAllPostsByUserID(id uint) ([]entity.Post, error) {
+	var posts []entity.Post
+	result := r.db.Where("user_id = ?", id).Find(&posts).Error
 	if result != nil {
 		return posts, result
 	}

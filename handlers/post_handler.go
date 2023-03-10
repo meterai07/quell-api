@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"quell-api/entity"
 	"quell-api/models"
@@ -14,10 +15,14 @@ import (
 
 type post_Handler struct {
 	post_Service service.PostService
+	user_Service service.Service
 }
 
-func NewPostHandler(post_Service service.PostService) *post_Handler {
-	return &post_Handler{post_Service}
+func NewPostHandler(post_Service service.PostService, user_Service service.Service) *post_Handler {
+	return &post_Handler{
+		post_Service,
+		user_Service,
+	}
 }
 
 func (h *post_Handler) GetPostHandler(c *gin.Context) {
@@ -59,6 +64,8 @@ func (h *post_Handler) CreatePostHandler(c *gin.Context) {
 		return
 	}
 
+	deadline := parseDate.Add(-7 * time.Hour)
+
 	checkType := body.Type
 	if checkType != "jadwal" && checkType != "tugas" {
 		response.Response(c, http.StatusBadRequest, "failed when checking type", nil)
@@ -68,7 +75,7 @@ func (h *post_Handler) CreatePostHandler(c *gin.Context) {
 	newBody := entity.Post{
 		Title:      body.Title,
 		Content:    body.Content,
-		Date:       parseDate,
+		Date:       deadline,
 		Type:       body.Type,
 		UserID:     c.MustGet("user").(entity.User).ID,
 		CategoryID: body.CategoryID,
@@ -115,4 +122,40 @@ func (h *post_Handler) DeletePostHandler(c *gin.Context) {
 		return
 	}
 	response.Response(c, http.StatusOK, "success", nil)
+}
+
+func (h *post_Handler) ActivateReminder(c *gin.Context) {
+	user, err := h.user_Service.GetUserByID(c.MustGet("user").(entity.User).ID)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, "failed when find user", nil)
+		return
+	}
+
+	if !user.IsPremium {
+		response.Response(c, http.StatusBadRequest, "user is not premium to activate this feature", nil)
+		return
+	}
+
+	posts, err := h.post_Service.FindAllPostsByUserID(c.MustGet("user").(entity.User).ID)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+		return
+	}
+
+	for _, post := range posts {
+		if post.Type == "jadwal" || post.Type == "tugas" {
+			deadline := post.Date
+			now := time.Now()
+
+			fmt.Println("Deadline:", deadline)
+			fmt.Println("Now:", now)
+
+			if deadline.After(now) {
+				fmt.Println("Deadline is later than now")
+			} else {
+				fmt.Println("Deadline has passed")
+			}
+		}
+	}
+
 }

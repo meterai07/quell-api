@@ -8,6 +8,7 @@ import (
 
 type PostService interface {
 	FindAll() ([]entity.Post, error)
+	FindAllPostsByUserID(id uint) ([]entity.Post, error)
 	FindById(id uint) (entity.Post, error)
 	CreatePost(post entity.Post) error
 	UpdatePost(post models.Post_Upload, id uint) error
@@ -24,6 +25,10 @@ func NewPostService(repository repository.PostRepository) PostService {
 
 func (s *postService) FindAll() ([]entity.Post, error) {
 	return s.repository.FindAll()
+}
+
+func (s *postService) FindAllPostsByUserID(id uint) ([]entity.Post, error) {
+	return s.repository.FindAllPostsByUserID(id)
 }
 
 func (s *postService) FindById(id uint) (entity.Post, error) {

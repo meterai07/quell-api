@@ -25,55 +25,6 @@ func NewUserHandler(userService service.Service) *user_Handler {
 	return &user_Handler{userService: userService}
 }
 
-func (h *user_Handler) DiscordLoginHandler(c *gin.Context) {
-	email := c.Query("email")
-	if email == "" {
-		response.Response(c, http.StatusBadRequest, "Invalid Email", nil)
-		c.Abort()
-		return
-	}
-	password := c.Query("password")
-	if password == "" {
-		response.Response(c, http.StatusBadRequest, "Invalid Token", nil)
-		c.Abort()
-		return
-	}
-
-	var user entity.User
-	result, err := h.userService.GetUserByEmail(email)
-	if err != nil {
-		response.Response(c, http.StatusUnauthorized, "Unauthorized", nil)
-		return
-	}
-	user = result
-
-	if !user.IsActive {
-		response.Response(c, http.StatusUnauthorized, "Email Not Validated", nil)
-		return
-	}
-
-	if err := crypto.CompareHash(user.Password, password); err != nil {
-		response.Response(c, http.StatusUnauthorized, "Password Not Validated", nil)
-		return
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.ID,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
-	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "Error while signing the token", nil)
-		return
-	}
-
-	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "/", "", false, true)
-
-	c.JSON(http.StatusOK, gin.H{"message": "User signed in successfully"})
-}
-
 func (h *user_Handler) LoginHandler(c *gin.Context) {
 	var body models.User_Login
 

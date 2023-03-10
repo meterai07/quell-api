@@ -29,7 +29,7 @@ func main() {
 
 	post_Repository := repository.NewPostRepository(initializers.DB)
 	post_Service := service.NewPostService(post_Repository)
-	post_Handler := handlers.NewPostHandler(post_Service)
+	post_Handler := handlers.NewPostHandler(post_Service, user_Service)
 
 	attachment_Repository := repository.NewAttachmentRepository(initializers.SupabaseClient)
 	attachment_Service := service.NewAttachmentService(attachment_Repository)
@@ -68,6 +68,7 @@ func main() {
 	v1.GET("/user/subscribe", middlewares.RequireAuth, payment_Handler.PremiumPayment)
 	v1.POST("/subscribe/validate", payment_Handler.PremiumPaymentValidate)
 	v1.GET("/user/transaction", middlewares.RequireAuth, payment_Handler.GetTransaction)
+	v1.GET("/user/activatereminder", middlewares.RequireAuth, post_Handler.ActivateReminder)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
 	v1.GET("/category/:id", category_Handler.GetCategoryByIdHandler)
