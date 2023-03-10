@@ -100,13 +100,12 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	_, err := p.paymentService.FindById(validatePayment.OrderID)
+	result, err := p.paymentService.FindById(validatePayment.OrderID)
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to find order id", err.Error())
 		return
 	}
 
-	// masalah disini
 	makeSignatureKey := validatePayment.OrderID + validatePayment.StatusCode + validatePayment.GrossAmount + os.Getenv("SERVER_KEY")
 	encodeSignatureKey, err := crypto.HashValueSha512(makeSignatureKey)
 	if err != nil {
@@ -114,23 +113,17 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	if err := crypto.CompareHash(encodeSignatureKey, validatePayment.SignatureKey); err != nil {
+	if err := crypto.CompareHashSha512(encodeSignatureKey, validatePayment.SignatureKey); err != nil {
 		response.Response(c, http.StatusBadRequest, "Failed to validate signature key", err.Error())
 		return
 	}
 
-	// result.Status = "SUCCESS"
+	result.Status = "SUCCESS"
 
-	// if validatePayment.SignatureKey != "" {
-	// 	result.Status = "SUCCESS"
-	// } else {
-	// 	result.Status = "FAILED"
-	// }
+	if err := p.paymentService.UpdatePayment(result, result.ID); err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to update payment", err.Error())
+		return
+	}
 
-	// if err := p.paymentService.UpdatePayment(result, result.ID); err != nil {
-	// 	response.Response(c, http.StatusBadRequest, "Failed to update payment", err.Error())
-	// 	return
-	// }
-
-	// response.Response(c, http.StatusOK, "success", result)
+	response.Response(c, http.StatusOK, "success", result)
 }
