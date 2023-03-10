@@ -77,7 +77,7 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 	if user.IsPremium {
 		s := gocron.NewScheduler(time.UTC)
 
-		s.Every(5).Second().Do(func() {
+		s.Every(1).Hour().Do(func() {
 			posts, err := h.postService.FindAllPostsByUserID(user.ID)
 			if err != nil {
 				response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
