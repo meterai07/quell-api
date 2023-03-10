@@ -118,10 +118,20 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 		return
 	}
 
-	result.Status = "SUCCESS"
+	if validatePayment.TransactionStatus == "settlement" {
+		result.Status = "SUCCESS"
 
-	if err := p.paymentService.UpdatePayment(result, result.ID); err != nil {
-		response.Response(c, http.StatusBadRequest, "Failed to update payment", err.Error())
+		if err := p.paymentService.UpdatePayment(result, result.ID); err != nil {
+			response.Response(c, http.StatusBadRequest, "Failed to update payment", err.Error())
+			return
+		}
+	}
+}
+
+func (p *PaymentHandler) GetTransaction(c *gin.Context) {
+	result, err := p.paymentService.FindAll()
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to get transaction", err.Error())
 		return
 	}
 
