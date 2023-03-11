@@ -1,2 +1,2 @@
-<h1>Quell-APi</h1>
+<h1>Quell-API</h1>
 <hr>
