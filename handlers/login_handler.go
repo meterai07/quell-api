@@ -99,11 +99,6 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 			}
 		})
 
-		// s.Every(5).Second().Do(func(p *post_Handler) {
-		// 	fmt.Println("masuk")
-		// 	p.ActivateReminder(c)
-		// })
-
 		s.StartAsync()
 	}
 
