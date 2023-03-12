@@ -22,7 +22,7 @@ func NewCategoryHandler(service service.CategoryService) *categoryHandler {
 func (h *categoryHandler) GetCategoryHandler(c *gin.Context) {
 	posts, err := h.service.FindAll()
 	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+		response.Response(c, http.StatusNotFound, "failed when find all data", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", posts)
@@ -31,13 +31,13 @@ func (h *categoryHandler) GetCategoryHandler(c *gin.Context) {
 func (h *categoryHandler) GetCategoryByIdHandler(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
+		response.Response(c, http.StatusNotFound, "failed when parsing id", nil)
 		return
 	}
 
 	post, err := h.service.FindById(uint(id))
 	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when get posts by id", nil)
+		response.Response(c, http.StatusNotFound, "failed when get posts by id", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", post)

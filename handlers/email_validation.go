@@ -51,7 +51,7 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 		var deleteUser entity.User
 		result, err := h.userService.GetUserByEmail(email)
 		if err != nil {
-			response.Response(c, http.StatusBadRequest, "Email not registered", nil)
+			response.Response(c, http.StatusNotFound, "Email not registered", nil)
 			c.Abort()
 			return
 		}
@@ -72,7 +72,7 @@ func (h *user_Handler) ValidateHandler(c *gin.Context) {
 
 	result, err := h.userService.GetUserByEmail(email)
 	if err != nil {
-		response.Response(c, http.StatusBadRequest, "Email not registered", nil)
+		response.Response(c, http.StatusNotFound, "Email not registered", nil)
 		c.Abort()
 		return
 	}

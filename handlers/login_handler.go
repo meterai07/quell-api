@@ -153,7 +153,7 @@ func (h *user_Handler) RegisterHandler(c *gin.Context) {
 	if result := h.userService.FindUserByEmail(body.Email); result {
 		user, err := h.userService.GetUserByEmail(body.Email)
 		if err != nil {
-			response.Response(c, http.StatusInternalServerError, "Internal Server Error When Getting User", nil)
+			response.Response(c, http.StatusNotFound, "User Not Found", nil)
 			c.Abort()
 			return
 		}

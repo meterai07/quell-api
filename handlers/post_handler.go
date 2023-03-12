@@ -25,7 +25,7 @@ func NewPostHandler(post_Service service.PostService) *post_Handler {
 func (h *post_Handler) GetPostHandler(c *gin.Context) {
 	posts, err := h.post_Service.FindAll()
 	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+		response.Response(c, http.StatusNotFound, "failed when find all data", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", posts)
@@ -120,30 +120,3 @@ func (h *post_Handler) DeletePostHandler(c *gin.Context) {
 	}
 	response.Response(c, http.StatusOK, "success", nil)
 }
-
-// func (h *post_Handler) ActivateReminder(c *gin.Context) {
-// 	posts, err := h.post_Service.FindAllPostsByUserID(c.MustGet("user").(entity.User).ID)
-// 	if err != nil {
-// 		response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
-// 		return
-// 	}
-
-// 	for _, post := range posts {
-// 		if post.Type == "jadwal" || post.Type == "tugas" {
-// 			deadline := post.Date
-// 			now := time.Now()
-
-// 			if deadline.After(now) {
-// 				fmt.Println("Year: ", deadline.Year(), "Month: ", deadline.Month(), "Day: ", deadline.Day(), "Hour: ", deadline.Hour(), "Minute: ", deadline.Minute(), "Second: ", deadline.Second())
-
-// 				duration := deadline.Sub(now)
-// 				if time.Duration(duration.Hours()) < 7*time.Hour {
-// 					if deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
-// 						fmt.Println("Reminder activated for ", post.ID)
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	// s.StartBlocking()
-// }

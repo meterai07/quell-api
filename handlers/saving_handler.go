@@ -22,7 +22,7 @@ func NewSavingHandler(savingService service.SavingService) *saving_handler {
 func (s *saving_handler) GetSavingHandler(c *gin.Context) {
 	result, err := s.savingService.FindAll()
 	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when get all saving", nil)
+		response.Response(c, http.StatusNotFound, "failed when get all saving", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", result)
@@ -31,7 +31,7 @@ func (s *saving_handler) GetSavingHandler(c *gin.Context) {
 func (s *saving_handler) GetSavingByIdHandler(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		response.Response(c, http.StatusBadRequest, "failed when parsing id", nil)
+		response.Response(c, http.StatusNotFound, "failed when parsing id", nil)
 		return
 	}
 

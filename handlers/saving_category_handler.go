@@ -22,7 +22,7 @@ func NewSavingCategoryHandler(savingCategoryService service.SavingCategoryServic
 func (h *SavingCategoryHandler) GetSavingCategoryHandler(c *gin.Context) {
 	result, err := h.savingCategoryService.FindAll()
 	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when get all saving category", nil)
+		response.Response(c, http.StatusNotFound, "failed when get all saving category", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", result)
@@ -37,7 +37,7 @@ func (h *SavingCategoryHandler) GetSavingCategoryByIdHandler(c *gin.Context) {
 
 	result, err := h.savingCategoryService.FindById(uint(id))
 	if err != nil {
-		response.Response(c, http.StatusInternalServerError, "failed when get saving category by id", nil)
+		response.Response(c, http.StatusNotFound, "failed when get saving category by id", nil)
 		return
 	}
 	response.Response(c, http.StatusOK, "success", result)
