@@ -53,7 +53,7 @@ func (h *attachmentHandler) UploadFile(c *gin.Context) {
 		PostID: uint(id),
 		Url:    link,
 	}
-	// test
+
 	err = h.service.CreateAttachment(newBody)
 	if err != nil {
 		response.Response(c, http.StatusInternalServerError, "Internal Server Error", err.Error())
