@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-	"net/smtp"
 	"os"
 	"quell-api/entity"
 	"quell-api/models"
@@ -15,7 +13,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-co-op/gocron"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -75,64 +72,42 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	if user.IsPremium {
-		s := gocron.NewScheduler(time.UTC)
+	// if user.IsPremium {
+	// 	s := gocron.NewScheduler(time.UTC)
 
-		s.Every(1).Minute().Do(func() {
-			posts, err := h.postService.FindAllPostsByUserID(user.ID)
-			if err != nil {
-				response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
-				return
-			}
+	// 	s.Every(1).Minute().Do(func() {
+	// 		posts, err := h.postService.FindAllPostsByUserID(user.ID)
+	// 		if err != nil {
+	// 			response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+	// 			return
+	// 		}
 
-			for _, post := range posts {
-				if post.Type == "jadwal" || post.Type == "tugas" {
-					deadline := post.Date
-					now := time.Now()
+	// 		for _, post := range posts {
+	// 			if post.Type == "jadwal" || post.Type == "tugas" {
+	// 				deadline := post.Date
+	// 				now := time.Now()
 
-					if deadline.After(now) {
-						duration := deadline.Sub(now)
-						if time.Duration(duration.Hours()) < 7*time.Hour && deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
-							fmt.Println("test")
-							if err := SendRemainderEmail(user.Email, post.Title, post.Type, post.Date); err != nil {
-								response.Response(c, http.StatusInternalServerError, "failed when send email", nil)
-								return
-							}
-						}
-					}
-				}
-			}
-		})
+	// 				if deadline.After(now) {
+	// 					duration := deadline.Sub(now)
+	// 					if time.Duration(duration.Hours()) < 7*time.Hour && deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
+	// 						fmt.Println("test")
+	// 						if err := SendRemainderEmail(user.Email, post.Title, post.Type, post.Date); err != nil {
+	// 							response.Response(c, http.StatusInternalServerError, "failed when send email", nil)
+	// 							return
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	})
 
-		s.StartAsync()
-	}
+	// 	s.StartAsync()
+	// }
 
 	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "/", "", false, true)
 
 	response.Response(c, http.StatusOK, "User signed in successfully", nil)
-}
-
-func SendRemainderEmail(email string, title string, typeTask string, date time.Time) error {
-	from := os.Getenv("SMTP_EMAIL")
-	password := os.Getenv("SMTP_PASSWORD")
-	host := os.Getenv("SMTP_HOST")
-	port := os.Getenv("SMTP_PORT")
-
-	auth := smtp.PlainAuth("", from, password, host)
-	subject := fmt.Sprintf("%s Reminder: %s on %s", typeTask, title, date.Format("January 2, 2006"))
-	body := fmt.Sprintf("Hello,\n\nThis is a friendly reminder that you have a %s scheduled for %s. Don't forget!\n\nBest regards,\nYour Reminder Service", typeTask, date.Format("Monday, January 2, 2006"))
-
-	msg := []byte("To: " + email + "\r\n" +
-		"Subject: " + subject + "\r\n" +
-		"\r\n" +
-		body + "\r\n")
-
-	err := smtp.SendMail(host+":"+port, auth, from, []string{email}, []byte(msg))
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (h *user_Handler) RegisterHandler(c *gin.Context) {

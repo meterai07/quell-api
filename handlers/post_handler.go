@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"net/smtp"
+	"os"
 	"quell-api/entity"
 	"quell-api/models"
 	"quell-api/sdk/response"
@@ -10,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
 )
 
 type post_Handler struct {
@@ -119,4 +123,86 @@ func (h *post_Handler) DeletePostHandler(c *gin.Context) {
 		return
 	}
 	response.Response(c, http.StatusOK, "success", nil)
+}
+
+var (
+	s *gocron.Scheduler
+)
+
+func (h *user_Handler) Reminder(c *gin.Context) {
+	typeReminder := c.Query("type")
+
+	user := c.MustGet("user").(entity.User)
+
+	if !user.IsPremium {
+		response.Response(c, http.StatusUnauthorized, "You must Premium to Access this content", nil)
+		return
+	}
+
+	if typeReminder == "start" {
+		s = gocron.NewScheduler(time.UTC)
+
+		posts, err := h.postService.FindAllPostsByUserID(user.ID)
+		if err != nil {
+			response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
+			return
+		}
+
+		s.Every(2).Hour().Do(CheckPost, c, posts, user)
+
+		s.StartAsync()
+		response.Response(c, http.StatusOK, "success", nil)
+		return
+	}
+
+	if typeReminder == "stop" {
+		if s != nil {
+			s.Remove(CheckPost)
+			response.Response(c, http.StatusOK, "the scheduler stopped", nil)
+			return
+		}
+	}
+
+	response.Response(c, http.StatusBadRequest, "failed when stopping because the feature not enabled", nil)
+}
+
+func CheckPost(c *gin.Context, posts []entity.Post, user entity.User) {
+	for _, post := range posts {
+		if post.Type == "jadwal" || post.Type == "tugas" {
+			deadline := post.Date
+			now := time.Now()
+
+			if deadline.After(now) {
+				duration := deadline.Sub(now)
+				if time.Duration(duration.Hours()) < 7*time.Hour && deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
+					fmt.Println("email sent")
+					if err := SendRemainderEmail(user.Email, post.Title, post.Type, post.Date); err != nil {
+						response.Response(c, http.StatusInternalServerError, "failed when sending email", nil)
+					}
+				}
+			}
+		}
+	}
+}
+
+func SendRemainderEmail(email string, title string, typeTask string, date time.Time) error {
+	from := os.Getenv("SMTP_EMAIL")
+	password := os.Getenv("SMTP_PASSWORD")
+	host := os.Getenv("SMTP_HOST")
+	port := os.Getenv("SMTP_PORT")
+
+	auth := smtp.PlainAuth("", from, password, host)
+	subject := fmt.Sprintf("%s Reminder: %s on %s", typeTask, title, date.Format("January 2, 2006"))
+	body := fmt.Sprintf("Hello,\n\nThis is a friendly reminder that you have a %s scheduled for %s. Don't forget!\n\nBest regards,\nYour Reminder Service, Quell", typeTask, date.Format("Monday, January 2, 2006"))
+
+	msg := []byte("To: " + email + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"\r\n" +
+		body + "\r\n")
+
+	err := smtp.SendMail(host+":"+port, auth, from, []string{email}, []byte(msg))
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -50,6 +50,7 @@ func main() {
 	// category, insert ,get, update, delete
 
 	router := gin.Default()
+
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -68,7 +69,7 @@ func main() {
 	v1.GET("/user/subscribe", middlewares.RequireAuth, payment_Handler.PremiumPayment)
 	v1.POST("/subscribe/validate", payment_Handler.PremiumPaymentValidate)
 	v1.GET("/user/transaction", middlewares.RequireAuth, payment_Handler.GetTransaction)
-	// v1.GET("/user/activatereminder", middlewares.RequireAuth, post_Handler.ActivateReminder)
+	v1.GET("/user/reminder", middlewares.RequireAuth, user_Handler.Reminder)
 
 	v1.GET("/category", category_Handler.GetCategoryHandler)
 	v1.GET("/category/:id", category_Handler.GetCategoryByIdHandler)
