@@ -139,6 +139,20 @@ func (h *user_Handler) Reminder(c *gin.Context) {
 		return
 	}
 
+	result, err := h.userService.GetPremiumByID(user.ID)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, "Error while getting premium", nil)
+		return
+	}
+
+	if !result.EndDate.Before(time.Now()) {
+		user.IsPremium = false
+		if err := h.userService.UpdateUser(user); err != nil {
+			response.Response(c, http.StatusInternalServerError, "Error while updating user", nil)
+			return
+		}
+	}
+
 	if typeReminder == "start" {
 		s = gocron.NewScheduler(time.UTC)
 

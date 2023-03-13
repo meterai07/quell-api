@@ -12,6 +12,8 @@ type Service interface {
 	FindUserByEmail(email string) bool
 	UpdateUser(user entity.User) error
 	DeleteUser(user entity.User) error
+	CreatePremium(premium entity.UserPremium) error
+	GetPremiumByID(id uint) (entity.UserPremium, error)
 }
 
 type userService struct {
@@ -69,4 +71,21 @@ func (s *userService) DeleteUser(user entity.User) error {
 		return result
 	}
 	return nil
+}
+
+func (s *userService) CreatePremium(premium entity.UserPremium) error {
+	result := s.repository.CreatePremium(premium)
+	if result != nil {
+		return result
+	}
+	return nil
+}
+
+func (s *userService) GetPremiumByID(id uint) (entity.UserPremium, error) {
+	var premium entity.UserPremium
+	result, err := s.repository.GetPremiumByID(id)
+	if err != nil {
+		return premium, err
+	}
+	return result, nil
 }

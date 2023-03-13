@@ -9,6 +9,7 @@ func SyncDatabase() {
 		entity.User{},
 		entity.Category{},
 		entity.Post{},
+		entity.UserPremium{},
 		entity.Attachment{},
 		entity.UserTransaction{},
 		entity.SavingCategory{},

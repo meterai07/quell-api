@@ -13,6 +13,8 @@ type UserRepository interface {
 	GetUserByID(id uint) (entity.User, error)
 	UpdateUser(user entity.User) error
 	DeleteUser(user entity.User) error
+	CreatePremium(premium entity.UserPremium) error
+	GetPremiumByID(id uint) (entity.UserPremium, error)
 }
 
 type userRepository struct {
@@ -69,4 +71,21 @@ func (r *userRepository) DeleteUser(user entity.User) error {
 		return result
 	}
 	return nil
+}
+
+func (r *userRepository) CreatePremium(premium entity.UserPremium) error {
+	result := r.DB.Create(&premium).Error
+	if result != nil {
+		return result
+	}
+	return nil
+}
+
+func (r *userRepository) GetPremiumByID(id uint) (entity.UserPremium, error) {
+	var premium entity.UserPremium
+	result := r.DB.Where("id = ?", id).First(&premium).Error
+	if result != nil {
+		return premium, result
+	}
+	return premium, nil
 }

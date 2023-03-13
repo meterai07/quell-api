@@ -7,6 +7,8 @@ import (
 	"quell-api/sdk/crypto"
 	"quell-api/sdk/response"
 	"quell-api/service"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -26,6 +28,12 @@ func NewPaymentHandler(paymentService service.PaymentService, userService servic
 }
 
 func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
+	month, err := strconv.ParseInt(c.Query("month"), 10, 64)
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, "Failed to parse month", err.Error())
+		return
+	}
+
 	var listData []entity.ItemDetailsContent
 	var ItemDetailsContent entity.ItemDetailsContent
 	var transactionDetails entity.TransactionDetailsContent
@@ -37,7 +45,7 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 		ID:       uuid.New().String(),
 		Name:     "Premium",
 		Price:    15000,
-		Quantity: 1,
+		Quantity: int(month),
 	}
 
 	transactionDetails = entity.TransactionDetailsContent{
@@ -77,6 +85,7 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 		GrossAmount: transactionDetails.Gross_Amount,
 		OrderID:     transactionDetails.Order_ID,
 		Status:      "PENDING",
+		Lifetime:    int(month),
 		UserID:      c.MustGet("user").(entity.User).ID,
 	}
 
@@ -147,6 +156,17 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 
 			if err := p.userService.UpdateUser(user); err != nil {
 				response.Response(c, http.StatusBadRequest, "Failed to update user", err.Error())
+				return
+			}
+
+			userPremium := entity.UserPremium{
+				StartDate: time.Now(),
+				EndDate:   time.Now().AddDate(0, result.Lifetime, 0),
+				UserID:    result.UserID,
+			}
+
+			if err := p.userService.CreatePremium(userPremium); err != nil {
+				response.Response(c, http.StatusBadRequest, "Failed to create premium", err.Error())
 				return
 			}
 		}

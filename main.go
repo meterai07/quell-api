@@ -60,7 +60,6 @@ func main() {
 	v1 := router.Group("/api/v1")
 
 	v1.POST("/login", user_Handler.LoginHandler)
-
 	v1.POST("/register", user_Handler.RegisterHandler)
 	v1.GET("/register/validate", user_Handler.ValidateHandler)
 	v1.DELETE("/logout", middlewares.RequireAuth, handlers.LogoutHandler)

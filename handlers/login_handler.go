@@ -72,6 +72,22 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 		return
 	}
 
+	if user.IsPremium {
+		result, err := h.userService.GetPremiumByID(user.ID)
+		if err != nil {
+			response.Response(c, http.StatusInternalServerError, "Error while getting premium", nil)
+			return
+		}
+
+		if !result.EndDate.Before(time.Now()) {
+			user.IsPremium = false
+			if err := h.userService.UpdateUser(user); err != nil {
+				response.Response(c, http.StatusInternalServerError, "Error while updating user", nil)
+				return
+			}
+		}
+	}
+
 	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "/", "", false, true)
 

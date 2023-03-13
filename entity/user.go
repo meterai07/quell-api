@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -22,5 +24,13 @@ type UserTransaction struct {
 	GrossAmount int    `gorm:"not null" validate:"required"`
 	OrderID     string `gorm:"unique;not null" validate:"required"`
 	Status      string `gorm:"not null" validate:"required,oneof=SUCCESS PENDING"`
+	Lifetime    int    `gorm:"not null" validate:"required"`
 	UserID      uint
+}
+
+type UserPremium struct {
+	gorm.Model
+	StartDate time.Time `gorm:"not null" validate:"required"`
+	EndDate   time.Time `gorm:"not null" validate:"required"`
+	UserID    uint
 }
