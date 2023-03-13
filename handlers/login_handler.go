@@ -72,38 +72,6 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	// if user.IsPremium {
-	// 	s := gocron.NewScheduler(time.UTC)
-
-	// 	s.Every(1).Minute().Do(func() {
-	// 		posts, err := h.postService.FindAllPostsByUserID(user.ID)
-	// 		if err != nil {
-	// 			response.Response(c, http.StatusInternalServerError, "failed when find all data", nil)
-	// 			return
-	// 		}
-
-	// 		for _, post := range posts {
-	// 			if post.Type == "jadwal" || post.Type == "tugas" {
-	// 				deadline := post.Date
-	// 				now := time.Now()
-
-	// 				if deadline.After(now) {
-	// 					duration := deadline.Sub(now)
-	// 					if time.Duration(duration.Hours()) < 7*time.Hour && deadline.Year() == now.Year() && deadline.Month() == now.Month() && deadline.Day() == now.Day() {
-	// 						fmt.Println("test")
-	// 						if err := SendRemainderEmail(user.Email, post.Title, post.Type, post.Date); err != nil {
-	// 							response.Response(c, http.StatusInternalServerError, "failed when send email", nil)
-	// 							return
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	})
-
-	// 	s.StartAsync()
-	// }
-
 	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "/", "", false, true)
 
