@@ -26,6 +26,10 @@ func NewPostHandler(post_Service service.PostService) *post_Handler {
 	}
 }
 
+var (
+	s *gocron.Scheduler
+)
+
 func (h *post_Handler) GetPostHandler(c *gin.Context) {
 	posts, err := h.post_Service.FindAll()
 	if err != nil {
@@ -124,10 +128,6 @@ func (h *post_Handler) DeletePostHandler(c *gin.Context) {
 	}
 	response.Response(c, http.StatusOK, "success", nil)
 }
-
-var (
-	s *gocron.Scheduler
-)
 
 func (h *user_Handler) Reminder(c *gin.Context) {
 	typeReminder := c.Query("type")
