@@ -165,10 +165,28 @@ func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
 				UserID:    result.UserID,
 			}
 
+			if already := p.userService.FindPremiumByID(result.UserID); already {
+				alreadyUser, err := p.userService.GetPremiumByID(result.UserID)
+				if err != nil {
+					response.Response(c, http.StatusNotFound, "User not found in premium", err.Error())
+					return
+				}
+
+				alreadyUser.EndDate = alreadyUser.EndDate.AddDate(0, result.Lifetime, 0)
+
+				if err := p.userService.UpdatePremium(alreadyUser); err != nil {
+					response.Response(c, http.StatusBadRequest, "Failed to update premium", err.Error())
+					return
+				}
+
+				return
+			}
+
 			if err := p.userService.CreatePremium(userPremium); err != nil {
 				response.Response(c, http.StatusBadRequest, "Failed to create premium", err.Error())
 				return
 			}
+			return
 		}
 	}
 }
