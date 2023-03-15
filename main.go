@@ -98,6 +98,8 @@ func main() {
 	v1.PUT("/savingcategory/:id", middlewares.RequireAuth, saving_Category_Handler.UpdateSavingCategoryHandler)
 	v1.DELETE("/savingcategory/:id", middlewares.RequireAuth, saving_Category_Handler.DeleteSavingCategoryHandler)
 
+	// ini adalah middleware untuk mengatasi cors
+
 	// router.Use(func(c *gin.Context) {
 	// 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	// 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
