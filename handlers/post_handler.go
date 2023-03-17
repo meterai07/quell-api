@@ -145,7 +145,7 @@ func (h *user_Handler) Reminder(c *gin.Context) {
 		return
 	}
 
-	if !result.EndDate.Before(time.Now()) {
+	if result.EndDate.Before(time.Now()) {
 		user.IsPremium = false
 		if err := h.userService.UpdateUser(user); err != nil {
 			response.Response(c, http.StatusInternalServerError, "Error while updating user", nil)
@@ -172,6 +172,7 @@ func (h *user_Handler) Reminder(c *gin.Context) {
 	if typeReminder == "stop" {
 		if s != nil {
 			s.Remove(CheckPost)
+			fmt.Println("scheduler stopped")
 			response.Response(c, http.StatusOK, "the scheduler stopped", nil)
 			return
 		}

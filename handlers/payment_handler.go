@@ -99,7 +99,6 @@ func (p *PaymentHandler) PremiumPayment(c *gin.Context) {
 }
 
 func (p *PaymentHandler) PremiumPaymentValidate(c *gin.Context) {
-	// endpoint ketika transaksi telah dibayar
 	var validatePayment entity.ValidatePayment
 
 	if err := c.ShouldBindJSON(&validatePayment); err != nil {

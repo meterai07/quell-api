@@ -79,7 +79,7 @@ func (h *user_Handler) LoginHandler(c *gin.Context) {
 			return
 		}
 
-		if !result.EndDate.Before(time.Now()) {
+		if result.EndDate.Before(time.Now()) {
 			user.IsPremium = false
 			if err := h.userService.UpdateUser(user); err != nil {
 				response.Response(c, http.StatusInternalServerError, "Error while updating user", nil)
